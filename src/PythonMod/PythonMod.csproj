@@ -1,0 +1,109 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net481</TargetFramework>
+    <OutputType>Library</OutputType>
+    <RootNamespace>PythonMod</RootNamespace>
+    <AssemblyName>PythonMod</AssemblyName>
+    <LangVersion>9.0</LangVersion>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <OutputPath>bin\$(Configuration)\</OutputPath>
+    <GameExePath>D:\Steam\steamapps\common\A Dance of Fire and Ice\A Dance of Fire and Ice.exe</GameExePath>
+    <AutoLaunchGame>false</AutoLaunchGame>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(GameExePath)' != ''">
+    <GameDir>$([System.IO.Path]::GetDirectoryName($(GameExePath)))</GameDir>
+    <GameFileName>$([System.IO.Path]::GetFileNameWithoutExtension($(GameExePath)))</GameFileName>
+    <ManagedAssembliesDir>$(GameDir)\$(GameFileName)_Data\Managed</ManagedAssembliesDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="pythonnet" Version="3.0.5" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>$(ManagedAssembliesDir)\UnityModManager\0Harmony.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>$(ManagedAssembliesDir)\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>$(ManagedAssembliesDir)\Assembly-CSharp-firstpass.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.IO.Compression.FileSystem" />
+    <Reference Include="Unity.TextMeshPro">
+      <HintPath>$(ManagedAssembliesDir)\Unity.TextMeshPro.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine">
+      <HintPath>$(ManagedAssembliesDir)\UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>$(ManagedAssembliesDir)\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>$(ManagedAssembliesDir)\UnityEngine.IMGUIModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.InputLegacyModule">
+      <HintPath>$(ManagedAssembliesDir)\UnityEngine.InputLegacyModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>$(ManagedAssembliesDir)\UnityEngine.TextRenderingModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>$(ManagedAssembliesDir)\UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UIModule">
+      <HintPath>$(ManagedAssembliesDir)\UnityEngine.UIModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityModManager">
+      <HintPath>$(ManagedAssembliesDir)\UnityModManager\UnityModManager.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Info.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="Runtime\.gitkeep" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <Target Name="CopyToOut" AfterTargets="Build">
+    <PropertyGroup>
+      <PythonModOutDir>$(ProjectDir)out\</PythonModOutDir>
+    </PropertyGroup>
+    <MakeDir Directories="$(PythonModOutDir)" />
+    <MakeDir Directories="$(PythonModOutDir)Runtime" />
+    <ItemGroup>
+      <PythonModFiles Include="$(OutputPath)*.dll;$(OutputPath)*.pdb;$(ProjectDir)Info.json" />
+      <PythonRuntimeFiles Include="$(ProjectDir)Runtime\**\*" Exclude="$(ProjectDir)Runtime\.gitkeep" />
+    </ItemGroup>
+    <Copy SourceFiles="@(PythonModFiles)" DestinationFolder="$(PythonModOutDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(PythonRuntimeFiles)" DestinationFolder="$(PythonModOutDir)Runtime\%(RecursiveDir)" SkipUnchangedFiles="true" />
+    <Message Text="PythonMod files copied to $(PythonModOutDir)" Importance="high" />
+  </Target>
+
+  <Target Name="DeployToGame" AfterTargets="CopyToOut" Condition="'$(GameExePath)' != '' AND Exists('$(GameExePath)')">
+    <PropertyGroup>
+      <PythonModDeployDir>$(GameDir)\Mods\PythonMod\</PythonModDeployDir>
+    </PropertyGroup>
+    <MakeDir Directories="$(PythonModDeployDir)" />
+    <ItemGroup>
+      <DeployFiles Include="$(ProjectDir)out\**\*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(DeployFiles)" DestinationFolder="$(PythonModDeployDir)%(RecursiveDir)" SkipUnchangedFiles="true" />
+    <Message Text="PythonMod deployed to $(PythonModDeployDir)" Importance="high" />
+  </Target>
+</Project>

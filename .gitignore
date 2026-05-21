@@ -1,0 +1,49 @@
+# .NET build output
+bin/
+obj/
+out/
+TestResults/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# IDE
+.vs/
+.vscode/.ropeproject/
+.idea/
+
+# Python caches and environments
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+
+# PythonMod generated/runtime data
+src/PythonMod/Runtime/*
+!src/PythonMod/Runtime/.gitkeep
+src/PythonMod/Mods/
+src/PythonMod/Config/
+src/PythonMod/Logs/
+src/PythonMod/Stubs/
+src/PythonMod/Lib/
+
+# Generated packages and local mod artifacts
+packages/
+.stubs/
+*.zip
+*.nupkg
+*.snupkg
+
+# OS files
+Thumbs.db
+Desktop.ini
+.DS_Store

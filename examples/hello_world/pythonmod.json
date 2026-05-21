@@ -1,0 +1,11 @@
+{
+  "id": "hello_world",
+  "name": "Hello World",
+  "version": "0.1.0",
+  "authors": ["PythonMod"],
+  "description": "Example PythonMod child mod.",
+  "entry": "main.py",
+  "inject": "Loaded",
+  "python": ">=3.11",
+  "dependencies": []
+}

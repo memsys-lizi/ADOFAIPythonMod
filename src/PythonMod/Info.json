@@ -1,0 +1,12 @@
+{
+  "Id": "PythonMod",
+  "DisplayName": "PythonMod",
+  "Author": "PythonMod Contributors",
+  "Version": "0.1.0",
+  "ManagerVersion": "0.27.0",
+  "Requirements": [],
+  "AssemblyName": "PythonMod.dll",
+  "EntryMethod": "PythonMod.Main.Load",
+  "HomePage": "",
+  "Repository": ""
+}
