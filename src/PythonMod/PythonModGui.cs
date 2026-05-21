@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -13,6 +14,7 @@ namespace PythonMod
         private int _selected;
         private string _installZipPath = "";
         private string _status = "";
+        private readonly Dictionary<string, Vector2> _logScrollPositions = new Dictionary<string, Vector2>();
 
         public PythonModGui(PythonModRegistry registry, PythonRuntimeHost runtime)
         {
@@ -145,9 +147,25 @@ namespace PythonMod
 
             DrawSettings(mod);
 
-            GUILayout.Label("Log");
-            GUILayout.TextArea(_registry.ReadLog(mod), GUILayout.Height(160));
+            DrawLog(mod);
             GUILayout.EndVertical();
+        }
+
+        private void DrawLog(PythonChildMod mod)
+        {
+            GUILayout.Label("Log");
+            if (!_logScrollPositions.TryGetValue(mod.Id, out var scrollPosition))
+            {
+                scrollPosition = Vector2.zero;
+            }
+
+            var log = _registry.ReadLog(mod);
+            var lines = string.IsNullOrEmpty(log) ? 1 : log.Count(x => x == '\n') + 1;
+            var contentHeight = Mathf.Max(150f, lines * 18f + 12f);
+            scrollPosition = GUILayout.BeginScrollView(scrollPosition, GUILayout.Height(170));
+            GUILayout.TextArea(log, GUILayout.MinHeight(contentHeight), GUILayout.ExpandWidth(true));
+            GUILayout.EndScrollView();
+            _logScrollPositions[mod.Id] = scrollPosition;
         }
 
         private void DrawSettings(PythonChildMod mod)
