@@ -10,8 +10,6 @@ namespace PythonMod
     {
         private readonly PythonModRegistry _registry;
         private readonly PythonRuntimeHost _runtime;
-        private Vector2 _listScroll;
-        private Vector2 _detailScroll;
         private int _selected;
         private string _installZipPath = "";
         private string _status = "";
@@ -77,7 +75,6 @@ namespace PythonMod
         {
             GUILayout.BeginVertical(GUILayout.Width(260));
             GUILayout.Label("Installed Python Mods");
-            _listScroll = GUILayout.BeginScrollView(_listScroll, GUILayout.Height(460));
             for (var i = 0; i < _registry.Mods.Count; i++)
             {
                 var mod = _registry.Mods[i];
@@ -87,19 +84,16 @@ namespace PythonMod
                     _selected = i;
                 }
             }
-            GUILayout.EndScrollView();
             GUILayout.EndVertical();
         }
 
         private void DrawDetails()
         {
             GUILayout.BeginVertical();
-            _detailScroll = GUILayout.BeginScrollView(_detailScroll, GUILayout.Height(520));
 
             if (_registry.Mods.Count == 0)
             {
                 GUILayout.Label("没有发现 Python Mod。");
-                GUILayout.EndScrollView();
                 GUILayout.EndVertical();
                 return;
             }
@@ -153,7 +147,6 @@ namespace PythonMod
 
             GUILayout.Label("Log");
             GUILayout.TextArea(_registry.ReadLog(mod), GUILayout.Height(160));
-            GUILayout.EndScrollView();
             GUILayout.EndVertical();
         }
 

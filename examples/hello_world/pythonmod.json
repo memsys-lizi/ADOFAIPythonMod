@@ -6,6 +6,6 @@
   "description": "Example PythonMod child mod.",
   "entry": "main.py",
   "inject": "Loaded",
-  "python": ">=3.11",
+  "python": ">=3.8",
   "dependencies": []
 }

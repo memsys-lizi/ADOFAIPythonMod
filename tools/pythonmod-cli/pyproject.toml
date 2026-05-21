@@ -2,7 +2,7 @@
 name = "pythonmod-cli"
 version = "0.1.0"
 description = "Developer CLI for PythonMod ADOFAI mods"
-requires-python = ">=3.11"
+requires-python = ">=3.8"
 dependencies = []
 
 [project.scripts]

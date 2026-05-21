@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Newtonsoft.Json;
 using Python.Runtime;
 
@@ -119,6 +120,26 @@ namespace PythonMod
 
             try
             {
+                LoadModWithPython(mod);
+            }
+            catch (Exception ex)
+            {
+                mod.State = PythonChildModState.Error;
+                mod.LastError = ex.ToString();
+                AppendLog(mod, "ERROR: " + ex);
+                Main.Mod.Logger.LogException(ex);
+            }
+            finally
+            {
+                _bridge.ActiveModId = null;
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void LoadModWithPython(PythonChildMod mod)
+        {
+            try
+            {
                 mod.State = PythonChildModState.Loading;
                 mod.LastError = null;
                 LoadSettings(mod);
@@ -149,22 +170,16 @@ spec.loader.exec_module(module)
                         mod.Module = scope.Get("module");
                     }
 
-                    if (mod.Module.HasAttr("load"))
+                    var module = (PyObject)mod.Module;
+                    if (module.HasAttr("load"))
                     {
-                        mod.Module.GetAttr("load").Invoke(CreateContext(mod));
+                        module.GetAttr("load").Invoke(CreateContext(mod));
                     }
                 }
 
                 SaveSettings(mod);
                 mod.State = PythonChildModState.Loaded;
                 AppendLog(mod, "Mod loaded.");
-            }
-            catch (Exception ex)
-            {
-                mod.State = PythonChildModState.Error;
-                mod.LastError = ex.ToString();
-                AppendLog(mod, "ERROR: " + ex);
-                Main.Mod.Logger.LogException(ex);
             }
             finally
             {
@@ -178,14 +193,7 @@ spec.loader.exec_module(module)
             {
                 if (_runtime.IsInitialized && mod.Module != null)
                 {
-                    using (Py.GIL())
-                    {
-                        _bridge.ActiveModId = mod.Id;
-                        if (mod.Module.HasAttr("unload"))
-                        {
-                            mod.Module.GetAttr("unload").Invoke(CreateContext(mod));
-                        }
-                    }
+                    UnloadModWithPython(mod);
                 }
             }
             catch (Exception ex)
@@ -197,13 +205,30 @@ spec.loader.exec_module(module)
             {
                 Events.RemoveMod(mod.Id);
                 _harmonyBridge.RemoveMod(mod.Id);
-                mod.Module?.Dispose();
+                if (mod.Module is IDisposable disposable)
+                {
+                    disposable.Dispose();
+                }
                 mod.Module = null;
                 if (mod.Enabled)
                 {
                     mod.State = PythonChildModState.Discovered;
                 }
                 _bridge.ActiveModId = null;
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private void UnloadModWithPython(PythonChildMod mod)
+        {
+            using (Py.GIL())
+            {
+                _bridge.ActiveModId = mod.Id;
+                var module = (PyObject)mod.Module;
+                if (module.HasAttr("unload"))
+                {
+                    module.GetAttr("unload").Invoke(CreateContext(mod));
+                }
             }
         }
 

@@ -18,7 +18,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="pythonnet" Version="3.0.5" />
+    <PackageReference Include="pythonnet_netstandard_py38_win" Version="2.5.2" />
+    <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
+    <PackageReference Include="System.Reflection.Emit" Version="4.0.0" PrivateAssets="all" />
+    <PackageReference Include="System.Reflection.Emit.ILGeneration" Version="4.0.0" PrivateAssets="all" />
+    <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.0.0" PrivateAssets="all" />
+    <PackageReference Include="System.Security.Permissions" Version="8.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
   </ItemGroup>
 
@@ -78,12 +83,23 @@
   <ItemGroup>
     <None Include="Info.json" CopyToOutputDirectory="PreserveNewest" />
     <None Include="Runtime\.gitkeep" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="$(MSBuildProgramFiles32)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\Facades\netstandard.dll" Link="netstandard.dll" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <FrameworkFacadeFiles Include="$(MSBuildProgramFiles32)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\Facades\*.dll" />
+    <RuntimeFrameworkFiles Include="$(WINDIR)\Microsoft.NET\Framework64\v4.0.30319\Microsoft.CSharp.dll" Condition="Exists('$(WINDIR)\Microsoft.NET\Framework64\v4.0.30319\Microsoft.CSharp.dll')" />
+    <RuntimeFrameworkFiles Include="$(WINDIR)\Microsoft.NET\Framework64\v4.0.30319\System.Dynamic.dll" Condition="Exists('$(WINDIR)\Microsoft.NET\Framework64\v4.0.30319\System.Dynamic.dll')" />
+    <PythonNetRuntimeDependencyFiles Include="$(NuGetPackageRoot)system.reflection.emit\4.0.0\lib\netcore50\System.Reflection.Emit.dll" Condition="Exists('$(NuGetPackageRoot)system.reflection.emit\4.0.0\lib\netcore50\System.Reflection.Emit.dll')" />
+    <PythonNetRuntimeDependencyFiles Include="$(NuGetPackageRoot)system.reflection.emit.ilgeneration\4.0.0\lib\netcore50\System.Reflection.Emit.ILGeneration.dll" Condition="Exists('$(NuGetPackageRoot)system.reflection.emit.ilgeneration\4.0.0\lib\netcore50\System.Reflection.Emit.ILGeneration.dll')" />
+    <PythonNetRuntimeDependencyFiles Include="$(NuGetPackageRoot)system.reflection.emit.lightweight\4.0.0\lib\netcore50\System.Reflection.Emit.Lightweight.dll" Condition="Exists('$(NuGetPackageRoot)system.reflection.emit.lightweight\4.0.0\lib\netcore50\System.Reflection.Emit.Lightweight.dll')" />
   </ItemGroup>
 
   <Target Name="CopyToOut" AfterTargets="Build">
     <PropertyGroup>
       <PythonModOutDir>$(ProjectDir)out\</PythonModOutDir>
     </PropertyGroup>
+    <RemoveDir Directories="$(PythonModOutDir)" Condition="Exists('$(PythonModOutDir)')" />
     <MakeDir Directories="$(PythonModOutDir)" />
     <MakeDir Directories="$(PythonModOutDir)Runtime" />
     <ItemGroup>
@@ -91,7 +107,10 @@
       <PythonRuntimeFiles Include="$(ProjectDir)Runtime\**\*" Exclude="$(ProjectDir)Runtime\.gitkeep" />
     </ItemGroup>
     <Copy SourceFiles="@(PythonModFiles)" DestinationFolder="$(PythonModOutDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(RuntimeFrameworkFiles)" DestinationFolder="$(PythonModOutDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(PythonNetRuntimeDependencyFiles)" DestinationFolder="$(PythonModOutDir)" SkipUnchangedFiles="true" />
     <Copy SourceFiles="@(PythonRuntimeFiles)" DestinationFolder="$(PythonModOutDir)Runtime\%(RecursiveDir)" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(FrameworkFacadeFiles)" DestinationFolder="$(PythonModOutDir)Facades\" SkipUnchangedFiles="true" />
     <Message Text="PythonMod files copied to $(PythonModOutDir)" Importance="high" />
   </Target>
 
@@ -100,6 +119,12 @@
       <PythonModDeployDir>$(GameDir)\Mods\PythonMod\</PythonModDeployDir>
     </PropertyGroup>
     <MakeDir Directories="$(PythonModDeployDir)" />
+    <ItemGroup>
+      <OldDeployBinaries Include="$(PythonModDeployDir)*.dll;$(PythonModDeployDir)*.pdb;$(PythonModDeployDir)*.cache;$(PythonModDeployDir)*.cache.pdb;$(PythonModDeployDir)Info.json" />
+    </ItemGroup>
+    <Delete Files="@(OldDeployBinaries)" TreatErrorsAsWarnings="true" />
+    <RemoveDir Directories="$(PythonModDeployDir)Runtime" Condition="Exists('$(PythonModDeployDir)Runtime')" />
+    <RemoveDir Directories="$(PythonModDeployDir)Facades" Condition="Exists('$(PythonModDeployDir)Facades')" />
     <ItemGroup>
       <DeployFiles Include="$(ProjectDir)out\**\*" />
     </ItemGroup>

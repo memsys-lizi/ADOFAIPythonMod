@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Python.Runtime;
 
 namespace PythonMod
@@ -51,6 +52,12 @@ namespace PythonMod
             }
 
             var snapshot = list.ToArray();
+            TriggerWithPython(snapshot, payload);
+        }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static void TriggerWithPython(EventHandler[] snapshot, object payload)
+        {
             MainThreadDispatcher.Enqueue(() =>
             {
                 using (Py.GIL())

@@ -19,7 +19,7 @@ scripts/                    本地辅助脚本
 
 ## 构建前置 Mod
 
-第一次构建前安装内置 CPython 运行时：
+第一次构建前安装内置 CPython 运行时。当前兼容后端使用 CPython 3.8 x64：
 
 ```powershell
 powershell -ExecutionPolicy Bypass -File .\scripts\Install-CPythonRuntime.ps1

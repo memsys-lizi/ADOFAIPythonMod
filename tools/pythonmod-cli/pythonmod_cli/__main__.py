@@ -32,7 +32,7 @@ def cmd_new(args: argparse.Namespace) -> int:
         "description": "A PythonMod mod.",
         "entry": "main.py",
         "inject": "Loaded",
-        "python": ">=3.11",
+        "python": ">=3.8",
         "dependencies": [],
     }
     write_json(target / "pythonmod.json", manifest)
@@ -64,7 +64,7 @@ def on_scene_loaded(scene):
         f"""[project]
 name = "{mod_id}"
 version = "0.1.0"
-requires-python = ">=3.11"
+requires-python = ">=3.8"
 dependencies = []
 """,
     )

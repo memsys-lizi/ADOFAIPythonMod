@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
-using Python.Runtime;
 
 namespace PythonMod
 {
@@ -37,7 +36,7 @@ namespace PythonMod
         public string Inject { get; set; } = "Loaded";
 
         [JsonProperty("python")]
-        public string Python { get; set; } = ">=3.11";
+        public string Python { get; set; } = ">=3.8";
 
         [JsonProperty("dependencies")]
         public List<string> Dependencies { get; set; } = new List<string>();
@@ -52,7 +51,7 @@ namespace PythonMod
         public PythonChildModState State { get; set; }
         public string LastError { get; set; }
         public string ModuleName { get; set; }
-        public PyObject Module { get; set; }
+        public object Module { get; set; }
         public Dictionary<string, SettingDefinition> Settings { get; } = new Dictionary<string, SettingDefinition>();
 
         public string Id => Manifest?.Id ?? "";

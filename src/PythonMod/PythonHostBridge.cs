@@ -138,6 +138,7 @@ namespace PythonMod
 
         public void Toast(string message, double duration)
         {
+            MainThreadDispatcher.Enqueue(() => ToastOverlay.Show(message, duration));
             Log("info", $"Toast: {message}");
         }
 
